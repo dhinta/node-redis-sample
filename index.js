@@ -5,8 +5,10 @@ import './lib/db.js';
 import './lib/shutdown.js';
 // Import & Set Schemas
 import './model/users/user.schema.js';
+import './model/blogs/blog.schema.js';
 // Import Routers
 import userRouter from './router/users.js';
+import blogRouter from './router/blogs.js';
 
 const app = express();
 const router = new express.Router();
@@ -23,6 +25,7 @@ router.use((req, res, next) => {
 router.get('/', (req, res) => res.status(403).send());
 app.use(router);
 app.use('/users', userRouter);
+app.use('/blogs', blogRouter);
 
 app.listen(
     process.env.port || 3000,

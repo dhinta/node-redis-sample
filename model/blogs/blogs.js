@@ -2,17 +2,17 @@ import mongoose from 'mongoose';
 import AppError from '../../lib/error.js';
 import CONST from '../../const.js';
 
-const HTTP_CODE = CONST.HTTP_CODE;
+const {HTTP_CODE} = CONST;
 
 mongoose.set('useFindAndModify', false);
 
-const UserModelInstance = mongoose.model('User');
-const UserModel = {
+const BlogModelInstance = mongoose.model('Blog');
+const BlogModel = {
   async get(id = null) {
     if (id) {
       try {
-        const user = await UserModelInstance.findById(id);
-        return user;
+        const blog = await BlogModelInstance.findById(id);
+        return blog;
       } catch (e) {
         console.log(e);
         // emitted error in error class with msg & send error response
@@ -20,19 +20,24 @@ const UserModel = {
       }
     }
     try {
-      const users = await UserModelInstance.find({});
-      return users;
+      const blogs = await BlogModelInstance.find({});
+      return blogs;
     } catch (e) {
       console.log(e);
       // emitted error in error class with msg & send error response
       return 'Error Processing data';
     }
   },
-  async create(data = null) {
-    const userDoc = new UserModelInstance(data);
-
+  async create(data = null, id = '') {
+    if (!id) {
+      return {
+        response: 'Error Processing data for unknown user',
+        statusCode: HTTP_CODE.inoperableEntry
+      };
+    }
     try {
-      await userDoc.save();
+      const blogDoc = new BlogModelInstance({...data, user: id});
+      await blogDoc.save();
       return {
         response: 'New Data Inserted',
         statusCode: HTTP_CODE.success
@@ -76,10 +81,10 @@ const UserModel = {
     }
 
     try {
-      const user = await UserModelInstance.findByIdAndUpdate(
+      const blog = await BlogModelInstance.findByIdAndUpdate(
           id, body, {new: true, runValidators: true}
       );
-      return user;
+      return blog;
     } catch (err) {
       const arrError = [];
       const objError = err.errors;
@@ -93,4 +98,4 @@ const UserModel = {
   }
 };
 
-export default UserModel;
+export default BlogModel;
